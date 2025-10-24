@@ -1,56 +1,64 @@
+Akshay Bawane
+	
+18:54 (5 minutes ago)
+	
+	
+to me
 version: "3.8"
 
 services:
-  nginx:
-    build: ./nginx
-    image: nginx
-    container_name: "nginx_cont"
-    ports:
-      - "80:80"
-    restart: always
-    depends_on:
-      - django_app
-    networks:
-      - notes-app-nw
-
-  django_app:
-    build:
-      context: .
-    image: django_app
-    container_name: "django_cont"
-    ports:
-      - "8000:8000"
-    command: sh -c "python manage.py migrate --noinput && gunicorn notesapp.wsgi --bind 0.0.0.0:8000"
-    env_file:
-      - ".env"
-    depends_on:
-      - db
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/admin || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - notes-app-nw
-
   db:
-    image: mysql
-    container_name: "db_cont"
+    image: mysql:8
+    container_name: db_cont
+    restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=test_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: notesdb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
     volumes:
       - ./data/mysql/db:/var/lib/mysql
+    networks:
+      - notes-app-nw
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 40s
+  django_app:
+    build: .
+    container_name: django_cont
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MYSQL_DATABASE: notesdb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+    command: >
+      sh -c "python manage.py migrate &&
+             gunicorn notesapp.wsgi:application --bind 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    networks:
+      - notes-app-nw
+
+  nginx:
+    build: ./nginx
+    container_name: nginx_cont
+    restart: always
+    depends_on:
+      - django_app
+    ports:
+      - "80:80"
     networks:
       - notes-app-nw
 
 networks:
   notes-app-nw:
+
+      
