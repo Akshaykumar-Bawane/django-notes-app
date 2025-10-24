@@ -2,23 +2,25 @@
 services:
   db:
     image: mysql:8.0
-    container_name: db_cont
+    container_name: "db_cont"
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: notesdb
+      MYSQL_DATABASE: test_db
       MYSQL_USER: root
       MYSQL_PASSWORD: root
+    ports: 
+      - "3306:3306"
     volumes:
       - ./data/mysql/db:/var/lib/mysql
     networks:
       - notes-app-nw
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 40s
+      retries: 10
+      start_period: 90s
   django_app:
     build: .
     container_name: django_cont
