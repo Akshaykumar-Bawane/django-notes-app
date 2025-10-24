@@ -15,12 +15,12 @@ services:
       - ./data/mysql/db:/var/lib/mysql
     networks:
       - notes-app-nw
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
+   # healthcheck:
+     # test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot || exit 1"]
+     # interval: 15s
+     # timeout: 10s
+     # retries: 10
+     # start_period: 120s
   django_app:
     build: .
     container_name: django_app
