@@ -23,7 +23,7 @@ services:
       start_period: 90s
   django_app:
     build: .
-    container_name: django_cont
+    container_name: django_app
     restart: always
     depends_on:
       db:
@@ -34,9 +34,7 @@ services:
       MYSQL_PASSWORD: root
       MYSQL_HOST: db
       MYSQL_PORT: 3306
-    command: >
-      sh -c "python manage.py migrate &&
-             gunicorn notesapp.wsgi:application --bind 0.0.0.0:8000"
+    command: sh -c "python manage.py migrate --noinput && gunicorn notesapp.wsgi:application --bind 0.0.0.0:8000"
     ports:
       - "8000:8000"
     networks:
