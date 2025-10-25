@@ -36,21 +36,21 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test_db
+      MYSQL_DATABASE: notesdb
       MYSQL_USER: root
       MYSQL_PASSWORD: root
     ports: 
       - "3306:3306"
-    volumes:
-      - ./data/mysql/db:/var/lib/mysql
+    # volumes:
+    #  - ./data/mysql/db:/var/lib/mysql
     networks:
       - notes-app-nw
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot || exit 1"]
-      interval: 15s
+      interval: 20s
       timeout: 10s
-      retries: 10
-      start_period: 120s
+      retries: 15
+      start_period: 180s
   
 networks:
   notes-app-nw:
