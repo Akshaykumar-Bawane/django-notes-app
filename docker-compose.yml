@@ -24,7 +24,7 @@ services:
       DB_PASSWORD: django_pass
       DB_HOST: db
       DB_PORT: 3306
-      command: >
+      command: 
         sh -c "python manage.py migrate && 
                     python manage.py collectstatic --noinput &&
                     gunicorn notesapp.wsgi:application --bind 0.0.0.0:8000"
@@ -46,8 +46,6 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-    networks:
-      - notes-app-nw
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 20s
