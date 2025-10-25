@@ -1,26 +1,16 @@
 
 services:
-  db:
-    image: mysql:8.0
-    container_name: "db_cont"
+  nginx:
+    build: ./nginx
+    container_name: nginx_cont
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test_db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-    ports: 
-      - "3306:3306"
-    volumes:
-      - ./data/mysql/db:/var/lib/mysql
+    depends_on:
+      - django_app
+    ports:
+      - "80:80"
     networks:
       - notes-app-nw
-   # healthcheck:
-     # test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot || exit 1"]
-     # interval: 15s
-     # timeout: 10s
-     # retries: 10
-     # start_period: 120s
+
   django_app:
     build: .
     container_name: django_app
@@ -38,19 +28,30 @@ services:
     ports:
       - "8000:8000"
     networks:
-      - notes-app-nw
-
-  nginx:
-    build: ./nginx
-    container_name: nginx_cont
+      - notes-app-nw    
+      
+  db:
+    image: mysql:8.0
+    container_name: "db_cont"
     restart: always
-    depends_on:
-      - django_app
-    ports:
-      - "80:80"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    ports: 
+      - "3306:3306"
+    volumes:
+      - ./data/mysql/db:/var/lib/mysql
     networks:
       - notes-app-nw
-
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+  
 networks:
   notes-app-nw:
 
