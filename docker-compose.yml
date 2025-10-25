@@ -52,7 +52,7 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 20s
       timeout: 10s
-      retries: 15
+      retries: 10
       start_period: 120s
   
 networks:
